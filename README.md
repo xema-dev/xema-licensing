@@ -1,6 +1,6 @@
 # xema-licensing
 
-Central source of truth for Neuralchowder licensing artifacts across repositories.
+Central source of truth for xema licensing artifacts across repositories.
 
 This repository stores:
 - Canonical license templates
