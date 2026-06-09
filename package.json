@@ -1,0 +1,10 @@
+{
+  "name": "xema-licensing",
+  "private": true,
+  "type": "module",
+  "license": "Apache-2.0",
+  "scripts": {
+    "sync": "node tools/sync-licenses.mjs",
+    "check": "node tools/check-drift.mjs"
+  }
+}

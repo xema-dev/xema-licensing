@@ -1,0 +1,79 @@
+organization: Neuralchowder Inc.
+copyright_year: 2026
+contact: licensing@neuralchowder.com
+
+defaults:
+  bsl:
+    change_license: "Mozilla Public License, Version 2.0"
+    change_date_policy: "Four years from first public release of each version"
+    spdx: "LicenseRef-Xema-BSL-1.1"
+    additional_use_grant_sections: |
+      [TODO: Insert approved Additional Use Grant sections 1-12 here verbatim.]
+  apache:
+    spdx: "Apache-2.0"
+  mit:
+    spdx: "MIT"
+  proprietary:
+    spdx: "LicenseRef-Xema-Proprietary"
+
+repos:
+  - name: xema-biome-sdk
+    path: repos/xema-biome-sdk
+    license: apache
+  - name: xema-biomes-community
+    path: repos/xema-biomes-community
+    license: bsl
+  - name: xema-community
+    path: repos/xema-community
+    license: bsl
+  - name: xema-cultivars
+    path: repos/xema-cultivars
+    license: proprietary
+  - name: xema-docs
+    path: repos/xema-docs
+    license: apache
+  - name: xema-kernel-contracts
+    path: repos/xema-kernel-contracts
+    license: apache
+  - name: xema-kernel-sdk
+    path: repos/xema-kernel-sdk
+    license: apache
+  - name: xema-operator
+    path: repos/xema-operator
+    license: proprietary
+  - name: xema-platform
+    path: repos/xema-platform
+    license: proprietary
+  - name: xema-runtime-core
+    path: repos/xema-runtime-core
+    license: bsl
+  - name: xema-store-api
+    path: repos/xema-store-api
+    license: proprietary
+  - name: xema-deploy
+    path: repos-infra/xema-deploy
+    license: proprietary
+  - name: xema-distributions
+    path: repos-infra/xema-distributions
+    license: ASK
+  - name: xema-infra-services
+    path: repos-infra/xema-infra-services
+    license: proprietary
+  - name: billing-api
+    path: submodules/billing-api
+    license: ASK
+  - name: event-hub-api
+    path: submodules/event-hub-api
+    license: apache
+  - name: identity-api
+    path: submodules/identity-api
+    license: apache
+  - name: llm-gateway-api
+    path: submodules/llm-gateway-api
+    license: apache
+  - name: secrets-api
+    path: submodules/secrets-api
+    license: apache
+  - name: xema-host-web
+    path: submodules/xema-host-web
+    license: bsl
