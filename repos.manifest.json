@@ -7,7 +7,7 @@
       "change_license": "Mozilla Public License, Version 2.0",
       "change_date_policy": "Four years from first public release of each version",
       "spdx": "LicenseRef-Xema-BSL-1.1",
-      "additional_use_grant_sections": "[TODO: Insert approved Additional Use Grant sections 1-12 here verbatim.]"
+      "additional_use_grant_sections": "The following definitions and clarifications form part of, and govern\nthe interpretation of, the Additional Use Grant set out above.\n\n  1. \"Production Use\" means any use of the Licensed Work other than for\n     development, testing, evaluation, demonstration, experimentation,\n     benchmarking, or other non-production purposes.\n\n  2. \"Affiliate\" means any entity that, directly or indirectly,\n     controls, is controlled by, or is under common control with you,\n     where \"control\" means ownership of more than fifty percent (50%) of\n     the voting interests of the entity, or the power to direct its\n     management.\n\n  3. \"Third Party\" means any natural person or legal entity other than\n     you and your Affiliates.\n\n  4. \"Competitive Offering\" means any product or service, made available\n     to one or more Third Parties for a fee or other consideration\n     (including without limitation on a paid, subscription,\n     advertising-supported, hosted, or managed-service basis), that is\n     offered or marketed as, or that competes with, a software platform,\n     runtime, orchestration system, agent or automation system,\n     extension or distribution marketplace, or other software system\n     that provides, in substantial part, the same or substantially\n     similar capabilities as those provided by the Licensed Work. A\n     product or service is a Competitive Offering whether the Licensed\n     Work is provided in whole or in part, alone or bundled with other\n     software, and whether modified or unmodified.\n\n  5. Providing, hosting, or managing the Licensed Work for a Third Party,\n     or otherwise making the Licensed Work available to a Third Party as\n     a hosted or managed service such that the Third Party obtains the\n     principal value or functionality of the Licensed Work, is a\n     Competitive Offering and is not permitted by the Additional Use\n     Grant.\n\n  6. Subject to the foregoing, the Additional Use Grant permits you to\n     make Production Use of the Licensed Work for your own internal\n     business purposes and to build, operate, and provide your own\n     products and services to Third Parties, provided that the Licensed\n     Work itself (whether modified or unmodified) is not the product or\n     service, and is not a Competitive Offering, made available to those\n     Third Parties.\n\n  7. You may modify the Licensed Work and create derivative works for\n     any purpose permitted by this License. Any Production Use of such\n     modified or derivative works remains subject to the same\n     restrictions as the Licensed Work, including the prohibition on\n     Competitive Offerings.\n\n  8. Use of the Licensed Work by your own employees, contractors, and\n     agents, acting on your behalf and for your benefit, is not by\n     itself making the Licensed Work available to a Third Party.\n\n  9. Embedding or distributing the Licensed Work as a component of your\n     own product or service is permitted only where the Licensed Work\n     does not constitute the principal value of that product or service\n     and the product or service is not a Competitive Offering.\n\n  10. Nothing in this Additional Use Grant grants any right to use any\n      name, trademark, service mark, or logo of the Licensor or its\n      Affiliates, except as reasonably required for customary\n      attribution.\n\n  11. The rights stated in this Additional Use Grant are the maximum\n      rights granted for Production Use prior to the Change Date. Any\n      Production Use not expressly permitted requires a separate\n      commercial license from the Licensor.\n\n  12. If any provision of this Additional Use Grant is held invalid or\n      unenforceable, that provision shall be limited or eliminated to\n      the minimum extent necessary so that the remainder of this\n      Additional Use Grant, and of this License, remains in full force\n      and effect. The Licensor reserves all rights not expressly granted\n      by this License.\n"
     },
     "apache": {
       "spdx": "Apache-2.0"
@@ -20,25 +20,105 @@
     }
   },
   "repos": [
-    { "name": "xema-biome-sdk", "path": "repos/xema-biome-sdk", "license": "apache" },
-    { "name": "xema-biomes-community", "path": "repos/xema-biomes-community", "license": "bsl" },
-    { "name": "xema-community", "path": "repos/xema-community", "license": "bsl" },
-    { "name": "xema-cultivars", "path": "repos/xema-cultivars", "license": "proprietary" },
-    { "name": "xema-docs", "path": "repos/xema-docs", "license": "apache" },
-    { "name": "xema-kernel-contracts", "path": "repos/xema-kernel-contracts", "license": "apache" },
-    { "name": "xema-kernel-sdk", "path": "repos/xema-kernel-sdk", "license": "apache" },
-    { "name": "xema-operator", "path": "repos/xema-operator", "license": "proprietary" },
-    { "name": "xema-platform", "path": "repos/xema-platform", "license": "proprietary" },
-    { "name": "xema-runtime-core", "path": "repos/xema-runtime-core", "license": "bsl" },
-    { "name": "xema-store-api", "path": "repos/xema-store-api", "license": "proprietary" },
-    { "name": "xema-deploy", "path": "repos-infra/xema-deploy", "license": "proprietary" },
-    { "name": "xema-distributions", "path": "repos-infra/xema-distributions", "license": "ASK" },
-    { "name": "xema-infra-services", "path": "repos-infra/xema-infra-services", "license": "proprietary" },
-    { "name": "billing-api", "path": "submodules/billing-api", "license": "ASK" },
-    { "name": "event-hub-api", "path": "submodules/event-hub-api", "license": "apache" },
-    { "name": "identity-api", "path": "submodules/identity-api", "license": "apache" },
-    { "name": "llm-gateway-api", "path": "submodules/llm-gateway-api", "license": "apache" },
-    { "name": "secrets-api", "path": "submodules/secrets-api", "license": "apache" },
-    { "name": "xema-host-web", "path": "submodules/xema-host-web", "license": "bsl" }
+    {
+      "name": "xema-biome-sdk",
+      "path": "repos/xema-biome-sdk",
+      "license": "apache"
+    },
+    {
+      "name": "xema-biomes-community",
+      "path": "repos/xema-biomes-community",
+      "license": "bsl"
+    },
+    {
+      "name": "xema-community",
+      "path": "repos/xema-community",
+      "license": "bsl"
+    },
+    {
+      "name": "xema-cultivars",
+      "path": "repos/xema-cultivars",
+      "license": "proprietary"
+    },
+    {
+      "name": "xema-docs",
+      "path": "repos/xema-docs",
+      "license": "apache"
+    },
+    {
+      "name": "xema-kernel-contracts",
+      "path": "repos/xema-kernel-contracts",
+      "license": "apache"
+    },
+    {
+      "name": "xema-kernel-sdk",
+      "path": "repos/xema-kernel-sdk",
+      "license": "apache"
+    },
+    {
+      "name": "xema-operator",
+      "path": "repos/xema-operator",
+      "license": "proprietary"
+    },
+    {
+      "name": "xema-platform",
+      "path": "repos/xema-platform",
+      "license": "proprietary"
+    },
+    {
+      "name": "xema-runtime-core",
+      "path": "repos/xema-runtime-core",
+      "license": "bsl"
+    },
+    {
+      "name": "xema-store-api",
+      "path": "repos/xema-store-api",
+      "license": "proprietary"
+    },
+    {
+      "name": "xema-deploy",
+      "path": "repos-infra/xema-deploy",
+      "license": "proprietary"
+    },
+    {
+      "name": "xema-distributions",
+      "path": "repos-infra/xema-distributions",
+      "license": "ASK"
+    },
+    {
+      "name": "xema-infra-services",
+      "path": "repos-infra/xema-infra-services",
+      "license": "proprietary"
+    },
+    {
+      "name": "billing-api",
+      "path": "submodules/billing-api",
+      "license": "ASK"
+    },
+    {
+      "name": "event-hub-api",
+      "path": "submodules/event-hub-api",
+      "license": "apache"
+    },
+    {
+      "name": "identity-api",
+      "path": "submodules/identity-api",
+      "license": "apache"
+    },
+    {
+      "name": "llm-gateway-api",
+      "path": "submodules/llm-gateway-api",
+      "license": "apache"
+    },
+    {
+      "name": "secrets-api",
+      "path": "submodules/secrets-api",
+      "license": "apache"
+    },
+    {
+      "name": "xema-host-web",
+      "path": "submodules/xema-host-web",
+      "license": "bsl"
+    }
   ]
 }

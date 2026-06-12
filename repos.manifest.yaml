@@ -8,7 +8,81 @@ defaults:
     change_date_policy: "Four years from first public release of each version"
     spdx: "LicenseRef-Xema-BSL-1.1"
     additional_use_grant_sections: |
-      [TODO: Insert approved Additional Use Grant sections 1-12 here verbatim.]
+      The following definitions and clarifications form part of, and govern
+      the interpretation of, the Additional Use Grant set out above.
+
+        1. "Production Use" means any use of the Licensed Work other than for
+           development, testing, evaluation, demonstration, experimentation,
+           benchmarking, or other non-production purposes.
+
+        2. "Affiliate" means any entity that, directly or indirectly,
+           controls, is controlled by, or is under common control with you,
+           where "control" means ownership of more than fifty percent (50%) of
+           the voting interests of the entity, or the power to direct its
+           management.
+
+        3. "Third Party" means any natural person or legal entity other than
+           you and your Affiliates.
+
+        4. "Competitive Offering" means any product or service, made available
+           to one or more Third Parties for a fee or other consideration
+           (including without limitation on a paid, subscription,
+           advertising-supported, hosted, or managed-service basis), that is
+           offered or marketed as, or that competes with, a software platform,
+           runtime, orchestration system, agent or automation system,
+           extension or distribution marketplace, or other software system
+           that provides, in substantial part, the same or substantially
+           similar capabilities as those provided by the Licensed Work. A
+           product or service is a Competitive Offering whether the Licensed
+           Work is provided in whole or in part, alone or bundled with other
+           software, and whether modified or unmodified.
+
+        5. Providing, hosting, or managing the Licensed Work for a Third Party,
+           or otherwise making the Licensed Work available to a Third Party as
+           a hosted or managed service such that the Third Party obtains the
+           principal value or functionality of the Licensed Work, is a
+           Competitive Offering and is not permitted by the Additional Use
+           Grant.
+
+        6. Subject to the foregoing, the Additional Use Grant permits you to
+           make Production Use of the Licensed Work for your own internal
+           business purposes and to build, operate, and provide your own
+           products and services to Third Parties, provided that the Licensed
+           Work itself (whether modified or unmodified) is not the product or
+           service, and is not a Competitive Offering, made available to those
+           Third Parties.
+
+        7. You may modify the Licensed Work and create derivative works for
+           any purpose permitted by this License. Any Production Use of such
+           modified or derivative works remains subject to the same
+           restrictions as the Licensed Work, including the prohibition on
+           Competitive Offerings.
+
+        8. Use of the Licensed Work by your own employees, contractors, and
+           agents, acting on your behalf and for your benefit, is not by
+           itself making the Licensed Work available to a Third Party.
+
+        9. Embedding or distributing the Licensed Work as a component of your
+           own product or service is permitted only where the Licensed Work
+           does not constitute the principal value of that product or service
+           and the product or service is not a Competitive Offering.
+
+        10. Nothing in this Additional Use Grant grants any right to use any
+            name, trademark, service mark, or logo of the Licensor or its
+            Affiliates, except as reasonably required for customary
+            attribution.
+
+        11. The rights stated in this Additional Use Grant are the maximum
+            rights granted for Production Use prior to the Change Date. Any
+            Production Use not expressly permitted requires a separate
+            commercial license from the Licensor.
+
+        12. If any provision of this Additional Use Grant is held invalid or
+            unenforceable, that provision shall be limited or eliminated to
+            the minimum extent necessary so that the remainder of this
+            Additional Use Grant, and of this License, remains in full force
+            and effect. The Licensor reserves all rights not expressly granted
+            by this License.
   apache:
     spdx: "Apache-2.0"
   mit:
