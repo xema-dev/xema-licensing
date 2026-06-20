@@ -1,5 +1,11 @@
 name: verify
 
+concurrency:
+  # Cancel superseded in-flight runs on PR branches; let main runs complete.
+  group: verify-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.ref != 'refs/heads/main' }}
+
+
 on:
   pull_request:
   push:
