@@ -13,7 +13,7 @@ on:
 
 jobs:
   verify:
-    runs-on: [self-hosted, linux, xema-dev]
+    runs-on: [self-hosted, linux]
     steps:
       - name: Checkout
         uses: actions/checkout@v4
