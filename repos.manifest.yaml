@@ -93,7 +93,7 @@ defaults:
 repos:
   - name: xema-biome-sdk
     path: repos/xema-biome-sdk
-    license: apache
+    license: bsl
   - name: xema-biomes-community
     path: repos/xema-biomes-community
     license: bsl
@@ -120,7 +120,7 @@ repos:
     license: proprietary
   - name: xema-runtime-core
     path: repos/xema-runtime-core
-    license: bsl
+    license: apache
   - name: xema-store-api
     path: repos/xema-store-api
     license: proprietary
@@ -135,19 +135,19 @@ repos:
     license: proprietary
   - name: billing-api
     path: submodules/billing-api
-    license: ASK
+    license: bsl
   - name: event-hub-api
     path: submodules/event-hub-api
-    license: apache
+    license: bsl
   - name: identity-api
     path: submodules/identity-api
-    license: apache
+    license: bsl
   - name: llm-gateway-api
     path: submodules/llm-gateway-api
-    license: apache
+    license: bsl
   - name: secrets-api
     path: submodules/secrets-api
-    license: apache
+    license: bsl
   - name: xema-host-web
     path: submodules/xema-host-web
     license: bsl
