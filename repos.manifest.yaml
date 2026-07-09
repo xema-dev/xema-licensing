@@ -94,9 +94,6 @@ repos:
   - name: xema-biome-sdk
     path: repos/xema-biome-sdk
     license: bsl
-  - name: xema-biomes-community
-    path: repos/xema-biomes-community
-    license: bsl
   - name: xema-community
     path: repos/xema-community
     license: bsl
