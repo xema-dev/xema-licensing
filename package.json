@@ -5,6 +5,7 @@
   "license": "Apache-2.0",
   "scripts": {
     "sync": "node tools/sync-licenses.mjs",
-    "check": "node tools/check-drift.mjs"
+    "check": "node tools/check-drift.mjs",
+    "check:manifest": "node tools/check-drift.mjs --manifest-only"
   }
 }

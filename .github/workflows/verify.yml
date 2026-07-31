@@ -11,9 +11,16 @@ on:
   push:
     branches: [main]
 
+permissions:
+  contents: read
+
 jobs:
   verify:
-    runs-on: [self-hosted, linux]
+    # GitHub-hosted. The org's self-hosted pool cannot serve this repo: the
+    # `Default` runner group has `allows_public_repositories: false`, so jobs
+    # labelled [self-hosted, linux] sat queued with no runner and were expired
+    # by GitHub after 24h. This job needs only Node and this repo's own files.
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -23,11 +30,12 @@ jobs:
         with:
           node-version: 22
 
-      - name: Setup pnpm
-        run: corepack enable
-
-      - name: Install dependencies
-        run: pnpm install --frozen-lockfile=false
-
-      - name: Validate drift
-        run: node tools/check-drift.mjs --workspace-root ../..
+      # Manifest + template validation only. The cross-repo drift check
+      # (tools/check-drift.mjs without --manifest-only) diffs the LICENSE and
+      # NOTICE of all 19 repos in repos.manifest.json and so requires them
+      # checked out as siblings -- which a standalone CI checkout never has,
+      # and which no available credential can produce (the org has no
+      # cross-repo token, and several of those repos are private). Run the
+      # full drift check from a local monorepo workspace instead.
+      - name: Validate manifest and templates
+        run: node tools/check-drift.mjs --manifest-only

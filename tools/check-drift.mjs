@@ -2,13 +2,20 @@
 import { readFile, stat } from "node:fs/promises";
 import { resolve, join } from "node:path";
 
+// A placeholder that survives render() means a template references a variable
+// render() does not substitute -- the rendered LICENSE would ship with literal
+// "{{ORG}}" in it.
+const UNRENDERED_PLACEHOLDER = /\{\{[A-Z_]+\}\}/g;
+
 function parseArgs(argv) {
-  const args = { workspaceRoot: "../.." };
+  const args = { workspaceRoot: "../..", manifestOnly: false };
   for (let i = 2; i < argv.length; i += 1) {
     const token = argv[i];
     if (token === "--workspace-root") {
       args.workspaceRoot = argv[i + 1];
       i += 1;
+    } else if (token === "--manifest-only") {
+      args.manifestOnly = true;
     }
   }
   return args;
@@ -40,6 +47,24 @@ async function readExisting(path) {
   } catch {
     return null;
   }
+}
+
+async function directoryExists(path) {
+  try {
+    return (await stat(path)).isDirectory();
+  } catch {
+    return false;
+  }
+}
+
+function varsForRepo(manifest, defaults, repo) {
+  return {
+    organization: manifest.organization,
+    year: manifest.copyright_year,
+    contact: manifest.contact,
+    repoName: repo.name,
+    bslAdditionalUseGrantSections: defaults?.bsl?.additional_use_grant_sections || "",
+  };
 }
 
 async function expectedFiles(baseDir, repo, defaults, vars) {
@@ -77,14 +102,54 @@ async function expectedFiles(baseDir, repo, defaults, vars) {
   throw new Error(`Unknown license kind '${repo.license}' for repo '${repo.name}'`);
 }
 
-async function main() {
-  const args = parseArgs(process.argv);
-  const baseDir = resolve(process.cwd());
-  const workspaceRoot = resolve(baseDir, args.workspaceRoot);
+// Self-contained: proves every declared license kind resolves to templates that
+// exist and render completely. Needs no sibling checkouts, so CI can run it.
+async function checkManifest(baseDir, manifest, defaults, repos) {
+  const problems = [];
 
-  const manifest = await loadManifest(baseDir);
-  const defaults = manifest.defaults || {};
-  const repos = manifest.repos || [];
+  for (const repo of repos) {
+    if (repo.license === "ASK") {
+      console.log(`SKIP ${repo.name}: license=ASK`);
+      continue;
+    }
+    if (!repo.path) {
+      problems.push(`${repo.name}: manifest entry has no 'path'`);
+      continue;
+    }
+
+    let expected;
+    try {
+      expected = await expectedFiles(baseDir, repo, defaults, varsForRepo(manifest, defaults, repo));
+    } catch (error) {
+      problems.push(`${repo.name}: ${error.message}`);
+      continue;
+    }
+    if (!expected) {
+      continue;
+    }
+
+    for (const [filename, content] of Object.entries(expected)) {
+      const leftover = [...new Set(content.match(UNRENDERED_PLACEHOLDER) || [])];
+      if (leftover.length > 0) {
+        problems.push(`${repo.name}: ${filename} has unrendered placeholders ${leftover.join(", ")}`);
+      }
+    }
+    console.log(`OK ${repo.name}: license=${repo.license} -> ${Object.keys(expected).join(", ")}`);
+  }
+
+  if (problems.length > 0) {
+    console.error("Manifest/template problems detected:");
+    for (const item of problems) {
+      console.error(`- ${item}`);
+    }
+    process.exit(1);
+  }
+
+  console.log(`Manifest and templates valid for ${repos.length} repos.`);
+}
+
+// Cross-repo: requires every declared repo to be checked out under workspaceRoot.
+async function checkDrift(baseDir, workspaceRoot, manifest, defaults, repos) {
   const mismatches = [];
 
   for (const repo of repos) {
@@ -93,22 +158,26 @@ async function main() {
       continue;
     }
 
-    const vars = {
-      organization: manifest.organization,
-      year: manifest.copyright_year,
-      contact: manifest.contact,
-      repoName: repo.name,
-      bslAdditionalUseGrantSections: defaults?.bsl?.additional_use_grant_sections || "",
-    };
+    const repoDir = join(workspaceRoot, repo.path);
+    // Fail fast, and distinguish "wrong workspace root" from real drift: an
+    // absent checkout previously reported as `missing LICENSE`, which reads
+    // identically to a repo that genuinely lost its LICENSE.
+    if (!(await directoryExists(repoDir))) {
+      throw new Error(
+        `Repo '${repo.name}' is not checked out at ${repoDir}. ` +
+          `check-drift needs every repo in repos.manifest.json present under the workspace root ` +
+          `(--workspace-root, currently ${workspaceRoot}). ` +
+          `To validate only this repo's manifest and templates, use --manifest-only.`,
+      );
+    }
 
-    const expected = await expectedFiles(baseDir, repo, defaults, vars);
+    const expected = await expectedFiles(baseDir, repo, defaults, varsForRepo(manifest, defaults, repo));
     if (!expected) {
       continue;
     }
 
     for (const [filename, expectedContent] of Object.entries(expected)) {
-      const target = join(workspaceRoot, repo.path, filename);
-      const actual = await readExisting(target);
+      const actual = await readExisting(join(repoDir, filename));
       if (actual === null) {
         mismatches.push(`${repo.name}: missing ${filename}`);
         continue;
@@ -128,6 +197,22 @@ async function main() {
   }
 
   console.log("No license drift detected.");
+}
+
+async function main() {
+  const args = parseArgs(process.argv);
+  const baseDir = resolve(process.cwd());
+
+  const manifest = await loadManifest(baseDir);
+  const defaults = manifest.defaults || {};
+  const repos = manifest.repos || [];
+
+  if (args.manifestOnly) {
+    await checkManifest(baseDir, manifest, defaults, repos);
+    return;
+  }
+
+  await checkDrift(baseDir, resolve(baseDir, args.workspaceRoot), manifest, defaults, repos);
 }
 
 main().catch((error) => {
