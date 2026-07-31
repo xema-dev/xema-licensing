@@ -2,6 +2,23 @@
 import { readFile, stat } from "node:fs/promises";
 import { resolve, join } from "node:path";
 
+import {
+  checkChangeDateRule,
+  checkFleetCoverage,
+  checkManifestMirror,
+  checkNoUndeclaredPublishChannel,
+  checkRenderedPunctuation,
+} from "./lib/checks.mjs";
+import {
+  LicenseKind,
+  MANIFEST_JSON,
+  describeUnresolved,
+  expectedFiles,
+  loadManifest,
+  varsForRepo,
+} from "./lib/manifest.mjs";
+import { checkExceptionShape, checkPackageLicenses, loadPackageLicenseExceptions } from "./lib/package-licenses.mjs";
+
 // A placeholder that survives render() means a template references a variable
 // render() does not substitute -- the rendered LICENSE would ship with literal
 // "{{ORG}}" in it.
@@ -16,28 +33,11 @@ function parseArgs(argv) {
       i += 1;
     } else if (token === "--manifest-only") {
       args.manifestOnly = true;
+    } else {
+      throw new Error(`Unknown argument '${token}'. Usage: check-drift.mjs [--workspace-root <dir>] [--manifest-only]`);
     }
   }
   return args;
-}
-
-function render(template, vars) {
-  return template
-    .replaceAll("{{ORG}}", vars.organization)
-    .replaceAll("{{YEAR}}", String(vars.year))
-    .replaceAll("{{CONTACT}}", vars.contact)
-    .replaceAll("{{REPO_NAME}}", vars.repoName)
-    .replaceAll("{{BSL_ADDITIONAL_USE_GRANT_SECTIONS}}", vars.bslAdditionalUseGrantSections || "");
-}
-
-async function loadManifest(baseDir) {
-  const raw = await readFile(join(baseDir, "repos.manifest.json"), "utf8");
-  return JSON.parse(raw);
-}
-
-async function loadTemplate(baseDir, licenseKind, filename) {
-  const fullPath = join(baseDir, "templates", licenseKind, filename);
-  return readFile(fullPath, "utf8");
 }
 
 async function readExisting(path) {
@@ -57,59 +57,32 @@ async function directoryExists(path) {
   }
 }
 
-function varsForRepo(manifest, defaults, repo) {
-  return {
-    organization: manifest.organization,
-    year: manifest.copyright_year,
-    contact: manifest.contact,
-    repoName: repo.name,
-    bslAdditionalUseGrantSections: defaults?.bsl?.additional_use_grant_sections || "",
-  };
+function report(heading, problems) {
+  if (problems.length === 0) {
+    return false;
+  }
+  console.error(`${heading}:`);
+  for (const problem of problems) {
+    console.error(`- ${problem}`);
+  }
+  return true;
 }
 
-async function expectedFiles(baseDir, repo, defaults, vars) {
-  if (repo.license === "bsl") {
-    return {
-      LICENSE: render(await loadTemplate(baseDir, "bsl-1.1", "LICENSE.tmpl"), vars),
-      NOTICE: render(await loadTemplate(baseDir, "bsl-1.1", "NOTICE.tmpl"), vars),
-    };
-  }
-
-  if (repo.license === "apache") {
-    return {
-      LICENSE: await loadTemplate(baseDir, "apache-2.0", "LICENSE"),
-      NOTICE: render(await loadTemplate(baseDir, "apache-2.0", "NOTICE.tmpl"), vars),
-    };
-  }
-
-  if (repo.license === "mit") {
-    return {
-      LICENSE: render(await loadTemplate(baseDir, "mit", "LICENSE.tmpl"), vars),
-    };
-  }
-
-  if (repo.license === "proprietary") {
-    return {
-      LICENSE: render(await loadTemplate(baseDir, "proprietary", "LICENSE.tmpl"), vars),
-      NOTICE: render(await loadTemplate(baseDir, "proprietary", "NOTICE.tmpl"), vars),
-    };
-  }
-
-  if (repo.license === "ASK") {
-    return null;
-  }
-
-  throw new Error(`Unknown license kind '${repo.license}' for repo '${repo.name}'`);
-}
-
-// Self-contained: proves every declared license kind resolves to templates that
-// exist and render completely. Needs no sibling checkouts, so CI can run it.
-async function checkManifest(baseDir, manifest, defaults, repos) {
+// Assertions that need only this repository's own files, so CI can run them
+// without checking out the governed fleet.
+async function checkManifestAndTemplates(baseDir, manifest, exceptions) {
   const problems = [];
 
-  for (const repo of repos) {
-    if (repo.license === "ASK") {
-      console.log(`SKIP ${repo.name}: license=ASK`);
+  problems.push(...(await checkManifestMirror(baseDir, manifest)));
+  problems.push(...(await checkChangeDateRule(baseDir, manifest)));
+  problems.push(...(await checkRenderedPunctuation(baseDir, manifest)));
+  // Only the SHAPE of the package-license exceptions here; matching them against
+  // real package manifests needs the fleet checked out (see checkDrift below).
+  problems.push(...checkExceptionShape(exceptions));
+
+  for (const repo of manifest.repos) {
+    if (repo.license === LicenseKind.Unresolved) {
+      problems.push(describeUnresolved(repo));
       continue;
     }
     if (!repo.path) {
@@ -119,12 +92,9 @@ async function checkManifest(baseDir, manifest, defaults, repos) {
 
     let expected;
     try {
-      expected = await expectedFiles(baseDir, repo, defaults, varsForRepo(manifest, defaults, repo));
+      expected = await expectedFiles(baseDir, repo, varsForRepo(manifest, repo));
     } catch (error) {
       problems.push(`${repo.name}: ${error.message}`);
-      continue;
-    }
-    if (!expected) {
       continue;
     }
 
@@ -137,24 +107,19 @@ async function checkManifest(baseDir, manifest, defaults, repos) {
     console.log(`OK ${repo.name}: license=${repo.license} -> ${Object.keys(expected).join(", ")}`);
   }
 
-  if (problems.length > 0) {
-    console.error("Manifest/template problems detected:");
-    for (const item of problems) {
-      console.error(`- ${item}`);
-    }
-    process.exit(1);
-  }
-
-  console.log(`Manifest and templates valid for ${repos.length} repos.`);
+  return problems;
 }
 
-// Cross-repo: requires every declared repo to be checked out under workspaceRoot.
-async function checkDrift(baseDir, workspaceRoot, manifest, defaults, repos) {
-  const mismatches = [];
+// Cross-repo: requires every governed repo to be checked out under workspaceRoot.
+async function checkDrift(baseDir, workspaceRoot, manifest, exceptions) {
+  const problems = await checkFleetCoverage(workspaceRoot, manifest);
+  problems.push(...(await checkNoUndeclaredPublishChannel(workspaceRoot, manifest)));
+  problems.push(...(await checkPackageLicenses(workspaceRoot, manifest, exceptions)));
 
-  for (const repo of repos) {
-    if (repo.license === "ASK") {
-      console.log(`SKIP ${repo.name}: license=ASK`);
+  for (const repo of manifest.repos) {
+    if (repo.license === LicenseKind.Unresolved) {
+      // Already reported by checkManifestAndTemplates, which always runs in the
+      // same invocation. There is no license kind here to render or compare.
       continue;
     }
 
@@ -163,56 +128,53 @@ async function checkDrift(baseDir, workspaceRoot, manifest, defaults, repos) {
     // absent checkout previously reported as `missing LICENSE`, which reads
     // identically to a repo that genuinely lost its LICENSE.
     if (!(await directoryExists(repoDir))) {
-      throw new Error(
-        `Repo '${repo.name}' is not checked out at ${repoDir}. ` +
-          `check-drift needs every repo in repos.manifest.json present under the workspace root ` +
-          `(--workspace-root, currently ${workspaceRoot}). ` +
-          `To validate only this repo's manifest and templates, use --manifest-only.`,
+      problems.push(
+        `${repo.name}: listed in ${MANIFEST_JSON} but not checked out at ${repoDir}. ` +
+          `Either check it out under the workspace root (--workspace-root, currently ${workspaceRoot}) ` +
+          `or remove the entry — a listed repo that nothing can read is unchecked, not governed.`,
       );
-    }
-
-    const expected = await expectedFiles(baseDir, repo, defaults, varsForRepo(manifest, defaults, repo));
-    if (!expected) {
       continue;
     }
 
+    const expected = await expectedFiles(baseDir, repo, varsForRepo(manifest, repo));
     for (const [filename, expectedContent] of Object.entries(expected)) {
       const actual = await readExisting(join(repoDir, filename));
       if (actual === null) {
-        mismatches.push(`${repo.name}: missing ${filename}`);
+        problems.push(`${repo.name}: missing ${filename}`);
         continue;
       }
       if (actual !== expectedContent) {
-        mismatches.push(`${repo.name}: drift in ${filename}`);
+        problems.push(`${repo.name}: drift in ${filename}`);
       }
     }
   }
 
-  if (mismatches.length > 0) {
-    console.error("License drift detected:");
-    for (const item of mismatches) {
-      console.error(`- ${item}`);
-    }
-    process.exit(1);
-  }
-
-  console.log("No license drift detected.");
+  return problems;
 }
 
 async function main() {
   const args = parseArgs(process.argv);
   const baseDir = resolve(process.cwd());
-
   const manifest = await loadManifest(baseDir);
-  const defaults = manifest.defaults || {};
-  const repos = manifest.repos || [];
+  const exceptions = await loadPackageLicenseExceptions(baseDir);
 
   if (args.manifestOnly) {
-    await checkManifest(baseDir, manifest, defaults, repos);
+    const problems = await checkManifestAndTemplates(baseDir, manifest, exceptions);
+    if (report("Manifest/template problems detected", problems)) {
+      process.exit(1);
+    }
+    console.log(`Manifest and templates valid for ${manifest.repos.length} repos.`);
     return;
   }
 
-  await checkDrift(baseDir, resolve(baseDir, args.workspaceRoot), manifest, defaults, repos);
+  const problems = [
+    ...(await checkManifestAndTemplates(baseDir, manifest, exceptions)),
+    ...(await checkDrift(baseDir, resolve(baseDir, args.workspaceRoot), manifest, exceptions)),
+  ];
+  if (report("License problems detected", problems)) {
+    process.exit(1);
+  }
+  console.log(`No license drift detected across ${manifest.repos.length} repos.`);
 }
 
 main().catch((error) => {

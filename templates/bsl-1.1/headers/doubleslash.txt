@@ -1,2 +1,2 @@
-// Copyright (c) {{YEAR}} {{ORG}}. All Rights Reserved.
+// Copyright (c) {{YEAR}} {{ORG}} All Rights Reserved.
 // SPDX-License-Identifier: LicenseRef-Xema-BSL-1.1

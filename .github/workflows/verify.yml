@@ -32,7 +32,7 @@ jobs:
 
       # Manifest + template validation only. The cross-repo drift check
       # (tools/check-drift.mjs without --manifest-only) diffs the LICENSE and
-      # NOTICE of all 19 repos in repos.manifest.json and so requires them
+      # NOTICE of every repo in repos.manifest.json and so requires them
       # checked out as siblings -- which a standalone CI checkout never has,
       # and which no available credential can produce (the org has no
       # cross-repo token, and several of those repos are private). Run the

@@ -1,36 +1,32 @@
 #!/usr/bin/env node
-import { readFile, writeFile, mkdir, stat } from "node:fs/promises";
+import { writeFile, mkdir, stat } from "node:fs/promises";
 import { resolve, dirname, join } from "node:path";
 
+import { LicenseKind, describeUnresolved, expectedFiles, loadManifest, varsForRepo } from "./lib/manifest.mjs";
+
 function parseArgs(argv) {
-  const args = { workspaceRoot: "../.." };
+  const args = { workspaceRoot: "../..", only: null };
   for (let i = 2; i < argv.length; i += 1) {
     const token = argv[i];
     if (token === "--workspace-root") {
       args.workspaceRoot = argv[i + 1];
       i += 1;
+    } else if (token === "--only") {
+      args.only = new Set(
+        (argv[i + 1] ?? "")
+          .split(",")
+          .map((value) => value.trim())
+          .filter((value) => value.length > 0),
+      );
+      i += 1;
+    } else {
+      throw new Error(`Unknown argument '${token}'. Usage: sync-licenses.mjs [--workspace-root <dir>] [--only <names>]`);
     }
   }
+  if (args.only && args.only.size === 0) {
+    throw new Error("--only requires at least one repo name");
+  }
   return args;
-}
-
-function render(template, vars) {
-  return template
-    .replaceAll("{{ORG}}", vars.organization)
-    .replaceAll("{{YEAR}}", String(vars.year))
-    .replaceAll("{{CONTACT}}", vars.contact)
-    .replaceAll("{{REPO_NAME}}", vars.repoName)
-    .replaceAll("{{BSL_ADDITIONAL_USE_GRANT_SECTIONS}}", vars.bslAdditionalUseGrantSections || "");
-}
-
-async function loadManifest(baseDir) {
-  const raw = await readFile(join(baseDir, "repos.manifest.json"), "utf8");
-  return JSON.parse(raw);
-}
-
-async function loadTemplate(baseDir, licenseKind, filename) {
-  const fullPath = join(baseDir, "templates", licenseKind, filename);
-  return readFile(fullPath, "utf8");
 }
 
 async function pathExists(path) {
@@ -55,68 +51,48 @@ async function main() {
   const workspaceRoot = resolve(baseDir, args.workspaceRoot);
 
   const manifest = await loadManifest(baseDir);
-  const defaults = manifest.defaults || {};
-  const repos = manifest.repos || [];
+  const unresolved = [];
+  const unknownNames = new Set(args.only ?? []);
 
-  for (const repo of repos) {
-    const repoName = repo.name;
-    const repoPath = repo.path;
-    const license = repo.license;
-
-    if (!repoName || !repoPath || !license) {
+  for (const repo of manifest.repos) {
+    if (!repo.name || !repo.path || !repo.license) {
       throw new Error(`Invalid manifest entry: ${JSON.stringify(repo)}`);
     }
+    unknownNames.delete(repo.name);
 
-    if (license === "ASK") {
-      console.log(`SKIP ${repoName}: license=ASK`);
+    if (args.only && !args.only.has(repo.name)) {
       continue;
     }
 
-    const repoAbs = join(workspaceRoot, repoPath);
+    if (repo.license === LicenseKind.Unresolved) {
+      // No decision means there is nothing to write. Collected and reported as
+      // a failure at the end so the rest of the fleet still syncs.
+      unresolved.push(describeUnresolved(repo));
+      continue;
+    }
+
+    const repoAbs = join(workspaceRoot, repo.path);
     if (!(await pathExists(repoAbs))) {
-      throw new Error(`Target repo path does not exist: ${repoPath}`);
+      throw new Error(`Target repo path does not exist: ${repo.path}`);
     }
 
-    const vars = {
-      organization: manifest.organization,
-      year: manifest.copyright_year,
-      contact: manifest.contact,
-      repoName,
-      bslAdditionalUseGrantSections: defaults?.bsl?.additional_use_grant_sections || "",
-    };
-
-    console.log(`APPLY ${repoName} (${license})`);
-    if (license === "bsl") {
-      const licenseTmpl = await loadTemplate(baseDir, "bsl-1.1", "LICENSE.tmpl");
-      const noticeTmpl = await loadTemplate(baseDir, "bsl-1.1", "NOTICE.tmpl");
-      console.log(`  wrote ${await writeRendered(workspaceRoot, repoPath, "LICENSE", render(licenseTmpl, vars))}`);
-      console.log(`  wrote ${await writeRendered(workspaceRoot, repoPath, "NOTICE", render(noticeTmpl, vars))}`);
-      continue;
+    console.log(`APPLY ${repo.name} (${repo.license})`);
+    const files = await expectedFiles(baseDir, repo, varsForRepo(manifest, repo));
+    for (const [filename, content] of Object.entries(files)) {
+      console.log(`  wrote ${await writeRendered(workspaceRoot, repo.path, filename, content)}`);
     }
+  }
 
-    if (license === "apache") {
-      const apacheLicense = await loadTemplate(baseDir, "apache-2.0", "LICENSE");
-      const noticeTmpl = await loadTemplate(baseDir, "apache-2.0", "NOTICE.tmpl");
-      console.log(`  wrote ${await writeRendered(workspaceRoot, repoPath, "LICENSE", apacheLicense)}`);
-      console.log(`  wrote ${await writeRendered(workspaceRoot, repoPath, "NOTICE", render(noticeTmpl, vars))}`);
-      continue;
+  if (unknownNames.size > 0) {
+    throw new Error(`--only names no such repo: ${[...unknownNames].join(", ")}`);
+  }
+
+  if (unresolved.length > 0) {
+    console.error("\nRepos with no license decision — nothing was written for these:");
+    for (const item of unresolved) {
+      console.error(`- ${item}`);
     }
-
-    if (license === "mit") {
-      const mitLicenseTmpl = await loadTemplate(baseDir, "mit", "LICENSE.tmpl");
-      console.log(`  wrote ${await writeRendered(workspaceRoot, repoPath, "LICENSE", render(mitLicenseTmpl, vars))}`);
-      continue;
-    }
-
-    if (license === "proprietary") {
-      const licTmpl = await loadTemplate(baseDir, "proprietary", "LICENSE.tmpl");
-      const noticeTmpl = await loadTemplate(baseDir, "proprietary", "NOTICE.tmpl");
-      console.log(`  wrote ${await writeRendered(workspaceRoot, repoPath, "LICENSE", render(licTmpl, vars))}`);
-      console.log(`  wrote ${await writeRendered(workspaceRoot, repoPath, "NOTICE", render(noticeTmpl, vars))}`);
-      continue;
-    }
-
-    throw new Error(`Unknown license kind '${license}' for repo '${repoName}'`);
+    process.exit(1);
   }
 }
 

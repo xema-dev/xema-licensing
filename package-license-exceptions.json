@@ -1,0 +1,29 @@
+{
+  "_readme": [
+    "Package-level license exceptions. Every publishable package.json in a governed repo",
+    "must declare `license` equal to its repo's SPDX class (repos.manifest.json defaults),",
+    "unless it appears here. `tools/check-package-licenses.mjs` enforces both halves.",
+    "",
+    "`status` is a closed set:",
+    "  documented — a deliberate, permanent difference. Requires `license` (the SPDX the",
+    "               package legitimately declares) and a substantive `reason`.",
+    "  unresolved — a KNOWN difference with no license decision behind it. Requires the",
+    "               question, the evidence, and the options. It FAILS the check, exactly",
+    "               like `license: unresolved` on a repo: a package whose license nobody",
+    "               decided is a live defect, not an exemption.",
+    "",
+    "Entries are checked for staleness: an entry whose package.json is gone, has become",
+    "private, or now matches its repo class fails as stale. Silence is never an option —",
+    "either the package matches its repo, or the difference is written down here."
+  ],
+  "exceptions": [
+    {
+      "package": "@acme/xema-biome-template-web",
+      "repo": "xema-host-web",
+      "path": "templates/template-third-party-web/package.json",
+      "status": "documented",
+      "license": "UNLICENSED",
+      "reason": "Not a Xema artifact. This is the scaffold rendered into a THIRD PARTY's own repository by the biome-template generator, under the placeholder scope @acme. Stamping Xema's BSL-1.1 on it would license someone else's generated package under Xema's terms. `UNLICENSED` is npm's marker for a package the generator's consumer is expected to replace with their own license."
+    }
+  ]
+}
