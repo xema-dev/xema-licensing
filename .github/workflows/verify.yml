@@ -20,7 +20,7 @@ jobs:
     # `Default` runner group has `allows_public_repositories: false`, so jobs
     # labelled [self-hosted, linux] sat queued with no runner and were expired
     # by GitHub after 24h. This job needs only Node and this repo's own files.
-    runs-on: [self-hosted, linux]
+    runs-on: ubuntu-24.04
     steps:
       - name: Checkout
         uses: actions/checkout@v4
