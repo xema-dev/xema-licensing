@@ -6,7 +6,6 @@
   "scripts": {
     "sync": "node tools/sync-licenses.mjs",
     "check": "node tools/check-drift.mjs",
-    "check:manifest": "node tools/check-drift.mjs --manifest-only",
-    "check:packages": "node tools/check-package-licenses.mjs"
+    "check:manifest": "node tools/check-drift.mjs --manifest-only"
   }
 }

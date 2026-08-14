@@ -7,6 +7,20 @@
 // Unlike check-drift.mjs, this resolves its own base directory from the module
 // URL rather than from process.cwd(), because the boundary gate spawns every
 // check with the aggregator root as cwd.
+//
+// ── ITS ONLY LIVE INVOCATION IS THE AGGREGATOR'S, AND THAT IS STRUCTURAL ────
+// The aggregator runs it as the `package-licenses` entry of
+// tooling/ci/run-boundary-checks.mjs. This repository deliberately does NOT
+// invoke it from its own `verify.yml`, and there used to be a `check:packages`
+// script implying otherwise — deleted 2026-08-14.
+//
+// The reason is the same one verify.yml already gives for the full drift check:
+// this walks the SIBLING repositories named in repos.manifest.json, and a
+// standalone CI checkout of this repo has none of them. It does not degrade
+// quietly in that situation — it exits 1 with "refusing to report coverage over
+// an empty scan" — so wiring it here would produce a workflow that can only ever
+// be red, and a script entry nothing can run is a gate that reads as
+// enforcement while being neither runnable nor run.
 import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
