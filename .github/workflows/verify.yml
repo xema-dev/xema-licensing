@@ -39,3 +39,9 @@ jobs:
       # full drift check from a local monorepo workspace instead.
       - name: Validate manifest and templates
         run: node tools/check-drift.mjs --manifest-only
+
+      # `node` directly, not `npm run`: the gate is self-contained (node
+      # builtins only) and must stay runnable from a bare checkout with no
+      # install.
+      - name: Every tracked source file is readable by search
+        run: node tooling/boundaries/lib/source-readability.mjs
