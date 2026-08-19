@@ -1,8 +1,7 @@
 name: verify
 
 concurrency:
-  # Cancel superseded in-flight runs on PR branches; let main runs complete
-  # (main feeds deploys/publishes — every merged SHA must produce its own run).
+  # Cancel superseded in-flight runs on PR branches; let main runs complete.
   #
   # The SHA is in the group ON PURPOSE. `cancel-in-progress: false` alone does
   # NOT give a merged SHA its own run: GitHub keeps at most ONE pending run per
