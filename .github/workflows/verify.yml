@@ -1,8 +1,23 @@
 name: verify
 
 concurrency:
-  # Cancel superseded in-flight runs on PR branches; let main runs complete.
-  group: verify-${{ github.workflow }}-${{ github.ref }}
+  # Cancel superseded in-flight runs on PR branches; let main runs complete
+  # (main feeds deploys/publishes — every merged SHA must produce its own run).
+  #
+  # The SHA is in the group ON PURPOSE. `cancel-in-progress: false` alone does
+  # NOT give a merged SHA its own run: GitHub keeps at most ONE pending run per
+  # concurrency group and CANCELS the previously pending one as soon as a newer
+  # run enters, so on a busy main every intermediate run is superseded before a
+  # runner ever picks it up. Measured 2026-08-19 in xema-base: 12 of the 12 most
+  # recent runs were `cancelled`, and every one of them was a SHA already merged
+  # to main — including the two commits that FIXED a red CI those runs existed to
+  # report. The repo had been red since 2026-08-18T20:28 and it stayed invisible
+  # because almost nothing ever completed.
+  #
+  # Making the group unique per SHA on main is what makes the line above true.
+  # PR branches keep one shared group and still coalesce, which is what that
+  # half was always for.
+  group: verify-${{ github.workflow }}-${{ github.ref }}-${{ github.ref == 'refs/heads/main' && github.sha || 'shared' }}
   cancel-in-progress: ${{ github.ref != 'refs/heads/main' }}
 
 
