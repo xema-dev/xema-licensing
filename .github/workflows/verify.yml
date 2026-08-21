@@ -42,7 +42,7 @@ jobs:
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
-          node-version: 22
+          node-version-file: .node-version
 
       # Manifest + template validation only. The cross-repo drift check
       # (tools/check-drift.mjs without --manifest-only) diffs the LICENSE and
