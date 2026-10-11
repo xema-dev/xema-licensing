@@ -1,8 +1,7 @@
 #!/usr/bin/env bash
 # INVOKER: none automated, by design — an OPERATOR command, run by hand against
-# the GitHub org. Nothing in any of the 29 repositories enumerated from
-# `.gitmodules` names it (sub-plan 02 item 1d, measured 2026-09-05), and nothing
-# should: it mutates branch protection through `gh`, which is an organisation
+# the GitHub org. Nothing in any of the repositories enumerated from
+# `.gitmodules` names it, and nothing should: it mutates branch protection through `gh`, which is an organisation
 # setting rather than a build artifact. Wiring it into CI would give a workflow
 # admin authority over its own merge rules.
 #

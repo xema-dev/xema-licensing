@@ -125,7 +125,7 @@
       "name": "xema-distributions",
       "path": "repos-infra/xema-distributions",
       "license": "proprietary",
-      "$comment": "RESOLVED 2026-07-31 by the split option. This repo keeps the commercial and internal editions (cloud, appliance-base, appliance-lean, minimal, starter, xema-internal), the delivery/entitlement plane, and the verifier trust policy — all of which disclose commercial edition composition and our signer policy. The publishable editions (core, oss) plus the resolution engine and the public Sigstore trusted root move to xema-distributions-open. Plan of record: .claude/plans/xema-distributions-open-proprietary-carve.md"
+      "$comment": "RESOLVED 2026-07-31 by the split option. This repo keeps the commercial and internal editions (cloud, appliance-base, appliance-lean, minimal, starter, xema-internal), the delivery/entitlement plane, and the verifier trust policy — all of which disclose commercial edition composition and our signer policy. The publishable editions (core, oss) plus the resolution engine and the public Sigstore trusted root move to xema-distributions-open."
     },
     {
       "name": "xema-fleet",

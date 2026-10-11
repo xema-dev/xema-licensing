@@ -158,7 +158,6 @@ repos:
   # trust policy — all of which disclose commercial edition composition and our
   # signer policy. The publishable editions (core, oss) plus the resolution
   # engine and the public Sigstore trusted root move to xema-distributions-open.
-  # Plan of record: .claude/plans/xema-distributions-open-proprietary-carve.md
   - name: xema-distributions
     path: repos-infra/xema-distributions
     license: proprietary
@@ -167,9 +166,8 @@ repos:
   # is not checked out fails checkFleetCoverage, which is correct: the manifest
   # states what the tree IS, never what it will become. Its full licensing
   # rationale (why Apache and not BSL, and the license-mixing defect a BSL lock
-  # would create inside the public Apache `xema-cli` package) lives in
-  # .claude/plans/xema-distributions-open-proprietary-carve.md §6, and the entry
-  # re-lands in the same commit that carves the repo, together with a rendered
+  # would create inside the public Apache `xema-cli` package) is part of that
+  # carve, and the entry re-lands in the same commit that carves the repo, together with a rendered
   # LICENSE + NOTICE (sync-licenses.mjs --only xema-distributions-open).
   - name: xema-fleet
     path: repos-infra/xema-fleet
