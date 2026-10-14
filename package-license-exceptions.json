@@ -24,6 +24,22 @@
       "status": "documented",
       "license": "UNLICENSED",
       "reason": "Not a Xema artifact. This is the scaffold rendered into a THIRD PARTY's own repository by the biome-template generator, under the placeholder scope @acme. Stamping Xema's BSL-1.1 on it would license someone else's generated package under Xema's terms. `UNLICENSED` is npm's marker for a package the generator's consumer is expected to replace with their own license."
+    },
+    {
+      "package": "@xemahq/channel-gateway-api-client",
+      "repo": "xema-apps",
+      "path": "packages/clients/channel-gateway-api/package.json",
+      "status": "documented",
+      "license": "LicenseRef-Xema-BSL-1.1",
+      "reason": "Public API client that originated in xema-community (BSL-1.1) and kept its published license when its biome moved into xema-apps (owner decision 2026-10-14). The rest of xema-apps is proprietary; a package move may relicense (ADR 0012) only by an explicit decision, and none has been made for this client, so its published terms stay as they were."
+    },
+    {
+      "package": "@xemahq/document-render-api-client",
+      "repo": "xema-apps",
+      "path": "packages/clients/document-render-api/package.json",
+      "status": "documented",
+      "license": "LicenseRef-Xema-BSL-1.1",
+      "reason": "Public API client that originated in xema-community (BSL-1.1) and kept its published license when its biome moved into xema-apps (owner decision 2026-10-14). The rest of xema-apps is proprietary; a package move may relicense (ADR 0012) only by an explicit decision, and none has been made for this client, so its published terms stay as they were."
     }
   ]
 }
