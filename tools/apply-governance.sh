@@ -33,7 +33,7 @@ set -euo pipefail
 ORG="xema-dev"
 REPOS=(
   xema-kernel-contracts xema-kernel-sdk xema-biome-sdk xema-runtime-core
-  xema-community identity-api event-hub-api llm-gateway-api secrets-api
+  xema-apps identity-api event-hub-api llm-gateway-api secrets-api
   billing-api xema-licensing
 )
 

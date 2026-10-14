@@ -95,6 +95,9 @@ defaults:
     spdx: "LicenseRef-Xema-Proprietary"
 
 repos:
+  - name: xema-apps
+    path: repos/xema-apps
+    license: proprietary
   - name: xema-base
     path: repos/xema-base
     license: bsl
@@ -112,16 +115,6 @@ repos:
   - name: xema-cli
     path: repos/xema-cli
     license: apache
-  - name: xema-community
-    path: repos/xema-community
-    license: bsl
-    release_channels:
-      - kind: "npm"
-        registry: "https://registry.npmjs.org"
-        scope: "@xemahq"
-  - name: xema-cultivars
-    path: repos/xema-cultivars
-    license: proprietary
   - name: xema-docs
     path: repos/xema-docs
     license: apache
