@@ -184,18 +184,6 @@
       ]
     },
     {
-      "name": "secrets-api",
-      "path": "submodules/secrets-api",
-      "license": "bsl",
-      "release_channels": [
-        {
-          "kind": "npm",
-          "registry": "https://registry.npmjs.org",
-          "scope": "@xemahq"
-        }
-      ]
-    },
-    {
       "name": "xema-host-web",
       "path": "submodules/xema-host-web",
       "license": "bsl",
