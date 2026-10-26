@@ -1,0 +1,32 @@
+name: CI
+
+on:
+  push:
+    branches: [develop, main]
+  pull_request:
+    branches: [develop, main]
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+permissions:
+  contents: read
+
+jobs:
+  ci:
+    name: Validate manifest and templates
+    # GitHub-hosted: this repo is public and the org's self-hosted group does not serve public repositories.
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .node-version
+
+      # The cross-repo drift check (tools/check-drift.mjs without --manifest-only) needs every repo checked out
+      # as a sibling, which CI never has; run it from a local monorepo workspace.
+      - name: Validate manifest and templates
+        run: node tools/check-drift.mjs --manifest-only
