@@ -11,10 +11,10 @@
 // ── ITS ONLY LIVE INVOCATION IS THE AGGREGATOR'S, AND THAT IS STRUCTURAL ────
 // The aggregator runs it as the `package-licenses` entry of
 // tooling/ci/run-boundary-checks.mjs. This repository deliberately does NOT
-// invoke it from its own `verify.yml`, and there used to be a `check:packages`
+// invoke it from its own `ci.yaml`, and there used to be a `check:packages`
 // script implying otherwise — deleted 2026-08-14.
 //
-// The reason is the same one verify.yml already gives for the full drift check:
+// The reason is the same one ci.yaml already gives for the full drift check:
 // this walks the SIBLING repositories named in repos.manifest.json, and a
 // standalone CI checkout of this repo has none of them. It does not degrade
 // quietly in that situation — it exits 1 with "refusing to report coverage over
