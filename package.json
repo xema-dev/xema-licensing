@@ -2,7 +2,7 @@
   "name": "xema-licensing",
   "private": true,
   "type": "module",
-  "license": "Apache-2.0",
+  "license": "LicenseRef-Xema-BSL-1.1",
   "scripts": {
     "sync": "node tools/sync-licenses.mjs",
     "check": "node tools/check-drift.mjs",
