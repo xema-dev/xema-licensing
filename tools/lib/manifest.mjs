@@ -1,6 +1,4 @@
-// Manifest + template loading and rendering. Shared by check-drift.mjs and
-// sync-licenses.mjs so the two tools can never disagree about what a given
-// license kind renders to.
+// Manifest + template loading and rendering. Used by sync-licenses.mjs.
 import { readFile } from "node:fs/promises";
 import { join } from "node:path";
 
@@ -44,7 +42,6 @@ export const ReleaseChannelKind = Object.freeze({
 export const RELEASE_CHANNEL_KINDS = Object.freeze(Object.values(ReleaseChannelKind));
 
 export const MANIFEST_JSON = "repos.manifest.json";
-export const MANIFEST_YAML = "repos.manifest.yaml";
 export const CHANGE_DATES_DOC = "CHANGE-DATES.md";
 
 export async function loadManifest(baseDir) {

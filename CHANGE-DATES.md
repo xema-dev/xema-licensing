@@ -29,19 +29,18 @@ wrong artifact here:
   to prevent.
 
 A version's Change Date becomes unprovable only if one of two things breaks.
-Both are checked mechanically by `tools/check-drift.mjs`:
+Both are owner-maintained rules:
 
 1. **The rule stops shipping with the work.** The BSL LICENSE template states the
    per-version derivation in its `Change Date` parameter, so every copy of the
    Licensed Work tells its recipient how to compute its own Change Date. The
-   check fails if that clause is removed from the template, or if the Change
-   License named in the template, in `repos.manifest.json`, and in this document
-   ever disagree.
+   clause must stay in the template, and the Change License named in the
+   template, in `repos.manifest.json`, and in this document must agree.
 2. **A repository releases through an undeclared channel.** Every `bsl` repo in
    `repos.manifest.json` must declare `release_channels` — where its public
    releases happen and therefore where the authoritative first-public-release
-   timestamp is read from. A `bsl` repo with no declared channel fails the check,
-   so a repository cannot start publishing without the lookup path being written
+   timestamp is read from. A `bsl` repo with no declared channel is incomplete,
+   so a repository must not start publishing without the lookup path being written
    down first.
 
 ## Determining `first_public_release(version)`
@@ -63,7 +62,5 @@ under the BSL, so no clock is running for any of its versions. That is what
 
 ## When a repository starts publishing
 
-Change `release_channels` in `repos.manifest.json` (and the `repos.manifest.yaml`
-mirror) from `none` to the real channel in the same change that enables
-publishing. `tools/check-drift.mjs` fails while a `bsl` repo has no channel
-declared, so this cannot be skipped silently.
+Change `release_channels` in `repos.manifest.json` from `none` to the real channel in the same change that enables
+publishing. A `bsl` repo must always have a channel declared.

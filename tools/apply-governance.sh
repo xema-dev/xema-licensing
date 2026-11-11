@@ -5,8 +5,7 @@
 # setting rather than a build artifact. Wiring it into CI would give a workflow
 # admin authority over its own merge rules.
 #
-# Its two siblings in this directory ARE wired — `tools/check-drift.mjs` as
-# `pnpm check` and `tools/sync-licenses.mjs` as `pnpm sync` — so the absence of
+# Its sibling `tools/sync-licenses.mjs` is wired as `pnpm sync` — so the absence of
 # a caller here is a property of what this script DOES, not an oversight.
 #
 # Apply standard branch-protection governance to a repo's `main`.

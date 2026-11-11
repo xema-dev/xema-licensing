@@ -13,32 +13,20 @@ that every repository carries the right legal files and package licenses.
 | Path | Purpose |
 |---|---|
 | `repos.manifest.json` | Machine-read list of governed repositories, each with a `license` (`bsl`, `apache`, `mit`, `proprietary` or `unresolved`) |
-| `repos.manifest.yaml` | Human-readable mirror, checked to match the JSON |
 | `templates/` | License, notice and header templates |
 | `package-license-exceptions.json` | Documented exceptions to the package-license rule |
 | `CHANGE-DATES.md` | How BSL Change Dates are derived |
 
-`unresolved` is a pending decision, not a license: it fails the check.
+`unresolved` is a pending decision, not a license: it blocks rendering.
 
 ## Usage
 
 ```bash
-# Manifest, mirror, templates and change-date rule (no other checkout needed)
-node tools/check-drift.mjs --manifest-only
-
-# Full check: fleet coverage, per-repository LICENSE/NOTICE drift, package licenses
-node tools/check-drift.mjs --workspace-root <workspace>
-
-# Package license rule only
-node tools/check-package-licenses.mjs --workspace-root <workspace>
-
 # Render legal files; --only limits the write to named repositories
 node tools/sync-licenses.mjs --workspace-root <workspace> --only <repo>,<repo>
 ```
 
-`<workspace>` is the directory containing the governed repositories. CI runs
-`--manifest-only`. `pnpm sync`, `pnpm check` and `pnpm check:manifest` wrap the
-same scripts.
+`<workspace>` is the directory containing the governed repositories. `pnpm sync` wraps the script.
 
 ## Links
 

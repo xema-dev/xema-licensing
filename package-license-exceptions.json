@@ -2,7 +2,7 @@
   "_readme": [
     "Package-level license exceptions. Every publishable package.json in a governed repo",
     "must declare `license` equal to its repo's SPDX class (repos.manifest.json defaults),",
-    "unless it appears here. `tools/check-package-licenses.mjs` enforces both halves.",
+    "unless it appears here. Reviewers enforce both halves.",
     "",
     "`status` is a closed set:",
     "  documented — a deliberate, permanent difference. Requires `license` (the SPDX the",
